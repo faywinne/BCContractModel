@@ -5,6 +5,10 @@ import java.sql.Timestamp;
 
 public class Block
 {
+	private static final int DATALENGTH = 100;
+	//max length for data (body)
+	//in a robust implementation would make this decided programmatically
+	
 	private int index;
 	private int previousHash;
 	private Timestamp timestamp;
@@ -22,11 +26,13 @@ public class Block
 		super();
 		this.index = index;
 		this.previousHash = previousHash;
-		this.data = data;
+		
 		this.publicKey = publicKey;
 		timestamp = new Timestamp(System.currentTimeMillis());
+		setData(data);
 		
-		this.hash = toHash();
+		//setData will hash at the end
+//		this.hash = toHash();
 	}
 	
 	public int toHash()
@@ -68,6 +74,26 @@ public class Block
 	}
 	public void setData(byte[] data)
 	{
+		this.data = new byte[DATALENGTH];
+		
+		//iterator to be used for two loops - copying data, and filling to full length
+		int i = 0;
+		
+		//copy bytes to this data block, but only up to cap datalength
+		while( i<data.length && i<DATALENGTH)
+		{
+			this.data[i] = data[i];
+			i++;
+		}
+		
+		//now fill rest of data body/intialize with byte 0
+		while (i < DATALENGTH)
+		{
+			this.data[i]=0;
+			i++;
+		}
+		
+		
 		this.data = data;
 		this.hash = toHash();
 	}
@@ -91,7 +117,7 @@ public class Block
 	
 	public String toString ()
 	{
-		return String.format("[index:%d, timestamp:%s, previousHash:%d, publicKey:%s, hash:%d, data:%s]", 
+		return String.format("[index:%d, timestamp:\"%s\", previousHash:%d, publicKey:\"%s\", hash:%d, data:\"%s\"]", 
 				index, timestamp, previousHash, publicKey, getHash(), new String(data, Charset.defaultCharset()));
 	}
 }
