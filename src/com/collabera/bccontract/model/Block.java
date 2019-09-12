@@ -2,6 +2,7 @@ package com.collabera.bccontract.model;
 
 import java.nio.charset.Charset;
 import java.sql.Timestamp;
+import java.util.Objects;
 
 public class Block
 {
@@ -37,8 +38,13 @@ public class Block
 	
 	public int toHash()
 	{
-		//to implement
-		return -1;
+		return Objects.hash(index, previousHash, timestamp, data, publicKey);
+	}
+	
+	//will be used later to check a block for tampering
+	public boolean checkHash()
+	{
+		return (this.hash == toHash());
 	}
 	
 	public int getIndex()
