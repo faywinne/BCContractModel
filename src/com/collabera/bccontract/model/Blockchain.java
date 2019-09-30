@@ -13,6 +13,10 @@ public class Blockchain
 		blocks = new ArrayList<Block>();
 	}
 	
+	/**
+	 * @param data body of text to offer information on peerlist and users/keys
+	 * @return block constructed to be head of hcain
+	 */
 	public Block buildFirstBlock(byte[] data)
 	{
 		//first block has no prior block's hash
@@ -25,6 +29,9 @@ public class Blockchain
 		return block;
 	}
 	
+	/**
+	 * @return last block on the chain
+	 */
 	public Block getLast()
 	{
 		return blocks.get(blocks.size()-1);
