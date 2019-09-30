@@ -1,0 +1,77 @@
+BlockchainContract Requirements
+
+data structure of blocks
+	-stored on disk
+	-integrity can be verified (hashes of merkle tree)
+	-a block contains relevant information for merkle tree
+	-a block also contains RSA encrypted body (contract text)
+there can exist blocks with unencrypted bodies, for user and peer info
+	-user info:
+		email (human-readable identifier + means of contact)
+		public RSA key (for encrypting contracts designated for that user)
+
+each node is a sender and receiver
+	-a node will provide blocks if asked
+	-a node can ask other known nodes for blocks
+
+a list of peers can be created and maintained
+	-an application instance with no blocks can utilize a live IP to init
+	-an application instance with part of a chain can use public (unencrypted)
+	blocks to search for live peers
+
+the app is accessed through browser, hosted by running app onto localhost
+
+
+
+
+Data model for blocks, blockchain
+	-id (for convenience)
+	-timestamp
+	-hash of previous block
+	-hash of this block
+	-body (arbitrary byte sequence eg text or encrypted text)
+	-public key (the one used to encrypt body)
+Repository for blocks
+	-custom file storage to be portable, without db overhead
+	-add(..), list(), get(id)
+BlockService to make blocks available:
+	getAll - respond with blocks this node has
+	fetchBlocks - find new blocks from peers
+		-verify integrity before saving to repo
+	fetchPeers - refresh list of known peers
+	verify - check integrity of a chain (matching hashes with prev hashes)
+
+
+ContractService to deliver to client-facing gui
+	take user email (sole identifier for user)
+	there is no password because app is p2p and not server auth
+	provides blocks sent to user (by listing those with public key matching your email)
+	can decrypt bodies with private key, stored locally
+	can add new blocks:
+		1 new contract sent to user, encrypts body with public key
+		2 sign contract with own private key
+
+
+
+Approach
+
+block data structure: in memory, console tester
+repo: persistent storage, console tester
+	-only one block in memory at a time
+	-random access list
+	-includes file for peer list
+blockservice:
+	-verify existing chain
+	-serve requests for whole chain
+	-make request to an ip for chain
+	-add a block
+	-serve requests for peer list
+	-make request for peer list
+contractservice:
+	-populate user list from public blocks
+	-take user input for email
+	-take user's private key (this is kept locally in memory only)
+	-display list of blocks that have (this user's) public key
+	-decrypt this contract in view
+	-add a block from a new contract (encrypt with some other public key)
+	-add a block using existing contract (encrypt with private key)
